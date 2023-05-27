@@ -1,5 +1,6 @@
 {
   inputs = {
+    "nixos-22.05".url = "github:NixOS/nixpkgs/nixos-22.05";
     "nixos-22.11".url = "github:NixOS/nixpkgs/nixos-22.11";
     "nixos-unstable".url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
@@ -9,6 +10,7 @@
     in inputs.flake-utils.lib.eachDefaultSystem (system:
       let
         nixpkgs = {
+          "nixos-22.05" = import inputs."nixos-22.05" { inherit system; };
           "nixos-22.11" = import inputs."nixos-22.11" { inherit system; };
           "nixos-unstable" = import inputs."nixos-unstable" { inherit system; };
         };
@@ -46,6 +48,10 @@
             })).colour-text;
 
           in rec {
+            ghc-8-10 = makeTestConfiguration {
+              pkgs = nixpkgs."nixos-22.05";
+              ghcVersion = "ghc8107";
+            };
             ghc-9-0 = makeTestConfiguration {
               pkgs = nixpkgs."nixos-22.11";
               ghcVersion = "ghc90";
@@ -69,7 +75,7 @@
             };
             all = pkgs.symlinkJoin {
               name = packageName;
-              paths = [ ghc-9-0 ghc-9-2 ghc-9-4 ghc-9-6 ];
+              paths = [ ghc-8-10 ghc-9-0 ghc-9-2 ghc-9-4 ghc-9-6 ];
             };
           };
         };
